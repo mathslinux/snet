@@ -24,15 +24,16 @@ typedef enum {
  */
 typedef struct _SInetAddrEntry
 {
-	struct sockaddr_in sa;
-	LIST_ENTRY(_SInetAddrEntry) entries;
+    struct sockaddr_in sa;
+    int ai_family;
+    LIST_ENTRY(_SInetAddrEntry) entries;
 } SInetAddrEntry;
 
 typedef struct _SInetAddr
 {
-	char *hostname;
-	int port;
-	LIST_HEAD(, _SInetAddrEntry) ia_head;
+    char *hostname;
+    int port;
+    LIST_HEAD(, _SInetAddrEntry) ia_head;
 } SInetAddr;
 
 /** 
@@ -59,11 +60,11 @@ void snet_inet_addr_free(SInetAddr *ia);
  * 
  */
 
-typedef struct _STCPClientSocket STCPClientSocket;
+typedef struct _STcpClientSocket STcpClientSocket;
 
-struct _STCPClientSocket {
+struct _STcpClientSocket {
     int sockfd;
-    SInetAddr *ia;
+    SInetAddr ia;
 };
 
 
@@ -75,13 +76,13 @@ struct _STCPClientSocket {
  * 
  * @return 
  */
-STCPClientSocket *snet_tcp_client_socket_new(const char *hostname, int port);
+STcpClientSocket *snet_tcp_client_socket_new(const char *hostname, int port);
 
 /** 
  * Free a TCP client socket
  * 
  * @param s 
  */
-void snet_tcp_client_socket_free(STCPClientSocket *s);
+void snet_tcp_client_socket_free(STcpClientSocket *s);
 
 #endif

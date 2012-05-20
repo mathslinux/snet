@@ -66,6 +66,7 @@ SInetAddr *snet_inet_addr_new(const char *hostname, int port)
 			memset(new, 0, sizeof(*new));
 		}
 		memcpy(&new->sa, curr->ai_addr, curr->ai_addrlen);
+        new->ai_family = curr->ai_family;
 		new->sa.sin_port = htons(port);
 		LIST_INSERT_HEAD(&ia->ia_head, new, entries);
 	}
