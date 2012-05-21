@@ -60,11 +60,58 @@ void snet_inet_addr_free(SInetAddr *ia);
  * 
  */
 
+typedef enum {
+    /* Code for socket read/write */
+    SNET_IO_OK,                 /**< Everything is ok */
+    SNET_IO_ERROR,              /**< Something error */
+    SNET_IO_EOF,                /**< No data need to process */
+} SnetError;
+
 typedef struct _STcpClientSocket STcpClientSocket;
+
+/* Socket read function, if this function return 0, stop watching
+ * this socket, else continue watching whether socket is readable */
+typedef int (*SReadFunc)(STcpClientSocket *st, void *data);
 
 struct _STcpClientSocket {
     int sockfd;
     SInetAddr ia;
+
+    /**
+     * Read socket, NB: this is block function, for async, see watch* helper.
+     * @param  st  STcpClientSocket instance
+     * @param  buf Buffer to write to
+     * @param  err Error code, if everything is ok, it will be SNET_IO_OK,
+     *         if no data need to read, it will be SNET_IO_EOF. For details,
+     *         see @SnetError
+     *
+     * @return The number of bytes read
+     * 
+     */
+    
+    int (*read)(STcpClientSocket *st, void *buf, int buflen, SnetError *err);
+
+    /** 
+     * Read socket asynchronously
+     * 
+     * @param st STcpClientSocket instance
+     * @param cb the function to call when data canbe read
+     *
+     */
+    void (*async_read)(STcpClientSocket *st, SReadFunc cb);
+    
+    /** 
+     * Write buffer to socket
+     * 
+     * @param buf Buffer to read from
+     * @param buflen Error code, if everything is ok, it will be SNET_IO_OK,
+     *        if nothing was written, it will be SNET_IO_EOF. For details,
+     *        see @SnetError
+     * @param err 
+     * 
+     * @return The number of bytes written
+     */
+    int (*write)(STcpClientSocket *st, void *buf, int buflen, SnetError *err);
 };
 
 
